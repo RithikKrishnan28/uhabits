@@ -47,7 +47,9 @@ class HistoryChart(
     var theme: Theme,
     var today: LocalDate,
     var onDateClickedListener: OnDateClickedListener = object : OnDateClickedListener {},
-    var padding: Double = 0.0
+    var padding: Double = 0.0,
+    var showLabels: Boolean = true,
+    var showWeekdays: Boolean = true
 ) : DataView {
 
     enum class Square {
@@ -107,9 +109,13 @@ class HistoryChart(
         squareSize = round((height - 2 * padding) / 8.0)
         canvas.setFontSize(min(14.0, height * 0.06))
 
-        val weekdayColumnWidth = DayOfWeek.values().map { weekday ->
-            canvas.measureText(dateFormatter.shortWeekdayName(weekday)) + squareSize * 0.15
-        }.maxOrNull() ?: 0.0
+        val weekdayColumnWidth = if (showWeekdays) {
+            DayOfWeek.values().map { weekday ->
+                canvas.measureText(dateFormatter.shortWeekdayName(weekday)) + squareSize * 0.15
+            }.maxOrNull() ?: 0.0
+        } else {
+            0.0
+        }
 
         nColumns = floor((width - 2 * padding - weekdayColumnWidth) / squareSize).toInt()
         val firstWeekdayOffset = (
@@ -131,16 +137,20 @@ class HistoryChart(
         }
 
         // Draw week day names
-        canvas.setColor(theme.mediumContrastTextColor)
-        repeat(7) { row ->
-            val date = topLeftDate.plus(row)
-            canvas.setTextAlign(TextAlign.LEFT)
-            canvas.drawText(
-                dateFormatter.shortWeekdayName(date),
-                padding + nColumns * squareSize + squareSize * 0.15,
-                padding + squareSize * (row + 1) + squareSize / 2
-            )
+        if (showWeekdays) {
+            canvas.setColor(theme.mediumContrastTextColor)
+            repeat(7) { row ->
+                val date = topLeftDate.plus(row)
+                canvas.setTextAlign(TextAlign.LEFT)
+                canvas.drawText(
+                    dateFormatter.shortWeekdayName(date),
+                    padding + nColumns * squareSize + squareSize * 0.15,
+                    padding + squareSize * (row + 1) + squareSize / 2
+                )
+            }
         }
+
+
     }
 
     private fun drawColumn(
@@ -185,11 +195,13 @@ class HistoryChart(
             }
         }
         canvas.setTextAlign(TextAlign.LEFT)
-        canvas.drawText(
-            headerText,
-            headerOverflow + padding + column * squareSize,
-            padding + squareSize / 2
-        )
+        if (showLabels) {
+            canvas.drawText(
+                headerText,
+                headerOverflow + padding + column * squareSize,
+                padding + squareSize / 2
+            )
+        }
 
         headerOverflow += canvas.measureText(headerText) + 0.1 * squareSize
         headerOverflow = max(0.0, headerOverflow - squareSize)
@@ -253,7 +265,9 @@ class HistoryChart(
 
         canvas.setColor(textColor)
         canvas.setTextAlign(TextAlign.CENTER)
-        canvas.drawText(date.day.toString(), x + width / 2, y + width / 2)
+        if (showLabels) {
+            canvas.drawText(date.day.toString(), x + width / 2, y + width / 2)
+        }
 
         if (hasNotes) {
             circleColor = when (value) {

@@ -147,11 +147,7 @@ abstract class BaseWidget(val context: Context, val id: Int, val stacked: Boolea
 
     protected val preferedBackgroundAlpha: Int
         get() {
-            return if (stacked) {
-                255
-            } else {
-                prefs.widgetOpacity
-            }
+            return 255
         }
 
     init {

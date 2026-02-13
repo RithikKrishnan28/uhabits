@@ -114,14 +114,14 @@ open class DarkTheme : Theme() {
     }
 }
 
-class PureBlackTheme : DarkTheme() {
+open class PureBlackTheme : DarkTheme() {
     override val appBackgroundColor = Color(0x000000)
     override val cardBackgroundColor = Color(0x000000)
     override val lowContrastTextColor = Color(0x212121)
 }
 
-class WidgetTheme : LightTheme() {
-    override val cardBackgroundColor = Color.TRANSPARENT
+class WidgetTheme : PureBlackTheme() {
+
     override val highContrastTextColor = Color.WHITE
     override val mediumContrastTextColor = Color.WHITE.withAlpha(0.50)
     override val lowContrastTextColor = Color.WHITE.withAlpha(0.10)
